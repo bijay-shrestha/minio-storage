@@ -1,5 +1,6 @@
 package com.bijay.miniostorage.resource;
 
+import com.bijay.miniostorage.service.NotificationService;
 import com.jlefebure.spring.boot.minio.MinioException;
 import com.jlefebure.spring.boot.minio.MinioService;
 import io.minio.messages.Item;
@@ -23,7 +24,7 @@ import java.util.Objects;
 @Slf4j
 public class UploadResource {
 
-    private MinioService minioService;
+    private final MinioService minioService;
 
     public UploadResource(MinioService minioService) {
         this.minioService = minioService;
@@ -72,7 +73,7 @@ public class UploadResource {
                                           HttpServletResponse response)
             throws IOException, MinioException {
         InputStream inputStream = minioService.get((Paths.get(subDirectory +"/" + object)));
-                ;
+        ;
         InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
 
         // SET THE CONTENT TYPE AND ATTACHMENT HEADER.
@@ -82,6 +83,11 @@ public class UploadResource {
         // COPY THE STREAM TO THE RESPONSE'S OUTPUT STREAM.
         IOUtils.copy(inputStream, response.getOutputStream());
         response.flushBuffer();
+    }
+
+    @PostMapping("/{object}")
+    public void deleteFiles(@PathVariable("object") String object) throws MinioException {
+        minioService.remove(Paths.get(object));
     }
 
 
