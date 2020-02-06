@@ -22,4 +22,15 @@ public class NotificationService {
                 .collect(Collectors.joining(","))
         );
     }
+
+    @MinioNotification({"s3:ObjectCreated:Post"})
+    public void handleUpload(NotificationInfo notificationInfo) {
+        log.info(Arrays
+                .stream(notificationInfo.records)
+                .map(notificationEvent -> "Receiving event " +
+                        notificationEvent.eventName + " for " +
+                        notificationEvent.s3.object.key)
+                .collect(Collectors.joining(","))
+        );
+    }
 }

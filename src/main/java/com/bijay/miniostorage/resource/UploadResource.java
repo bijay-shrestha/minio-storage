@@ -30,10 +30,11 @@ public class UploadResource {
     }
 
     @GetMapping
-    public List<Item> testMinio() throws MinioException {
+    public List<Item> getAllList() throws MinioException {
         return minioService.list();
     }
 
+    //FOR NO SUB-DIRECTORY CASE
     @GetMapping("/{object}")
     public void getObject(@PathVariable("object") String object,
                           HttpServletResponse response)
@@ -52,7 +53,7 @@ public class UploadResource {
 
     @PostMapping
     public void addAttachement(@RequestParam("file") MultipartFile file) {
-        Path path = Paths.get(Objects.requireNonNull("bijay/"+file.getOriginalFilename()));
+        Path path = Paths.get(Objects.requireNonNull(file.getOriginalFilename()));
         log.info("The designated path is :: {}", path);
         try {
             minioService.upload(path, file.getInputStream(), file.getContentType());
@@ -63,4 +64,25 @@ public class UploadResource {
             throw new IllegalStateException("The file cannot be read", e);
         }
     }
+
+    //FOR SUB-DIRECTORY CASE
+    @GetMapping("/{subDirectory}/{object}")
+    public void getObjectWithSubDirectory(@PathVariable("subDirectory") String subDirectory,
+                                          @PathVariable("object") String object,
+                                          HttpServletResponse response)
+            throws IOException, MinioException {
+        InputStream inputStream = minioService.get((Paths.get(subDirectory +"/" + object)));
+                ;
+        InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
+
+        // SET THE CONTENT TYPE AND ATTACHMENT HEADER.
+        response.addHeader("Content-disposition", "attachment;filename=" + object);
+        response.setContentType(URLConnection.guessContentTypeFromName(object));
+
+        // COPY THE STREAM TO THE RESPONSE'S OUTPUT STREAM.
+        IOUtils.copy(inputStream, response.getOutputStream());
+        response.flushBuffer();
+    }
+
+
 }
