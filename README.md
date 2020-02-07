@@ -2,7 +2,7 @@
 There're millionth way to do minio-storage.
 This one was with less bulls#its.
 
-# Run in Postman
+# Postman Collection
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/bc15dcba59d278f02c99)
 
