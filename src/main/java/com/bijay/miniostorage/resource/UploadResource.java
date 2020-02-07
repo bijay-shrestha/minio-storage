@@ -30,27 +30,6 @@ public class UploadResource {
         this.minioService = minioService;
     }
 
-    @GetMapping
-    public List<Item> getAllList() throws MinioException {
-        return minioService.list();
-    }
-
-    //FOR NO SUB-DIRECTORY CASE
-    @GetMapping("/{object}")
-    public void getObject(@PathVariable("object") String object,
-                          HttpServletResponse response)
-            throws IOException, MinioException {
-        InputStream inputStream = minioService.get(Paths.get(object));
-        InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
-
-        // SET THE CONTENT TYPE AND ATTACHMENT HEADER.
-        response.addHeader("Content-disposition", "attachment;filename=" + object);
-        response.setContentType(URLConnection.guessContentTypeFromName(object));
-
-        // COPY THE STREAM TO THE RESPONSE'S OUTPUT STREAM.
-        IOUtils.copy(inputStream, response.getOutputStream());
-        response.flushBuffer();
-    }
 
     @PostMapping
     public void addAttachment(@RequestParam("file") MultipartFile file) {
@@ -82,6 +61,28 @@ public class UploadResource {
         }
     }
 
+    @GetMapping
+    public List<Item> getAllList() throws MinioException {
+        return minioService.list();
+    }
+
+    //FOR NO SUB-DIRECTORY CASE
+    @GetMapping("/{object}")
+    public void getObject(@PathVariable("object") String object,
+                          HttpServletResponse response)
+            throws IOException, MinioException {
+        InputStream inputStream = minioService.get(Paths.get(object));
+        InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
+
+        // SET THE CONTENT TYPE AND ATTACHMENT HEADER.
+        response.addHeader("Content-disposition", "attachment;filename=" + object);
+        response.setContentType(URLConnection.guessContentTypeFromName(object));
+
+        // COPY THE STREAM TO THE RESPONSE'S OUTPUT STREAM.
+        IOUtils.copy(inputStream, response.getOutputStream());
+        response.flushBuffer();
+    }
+
     //FOR SUB-DIRECTORY CASE
     @GetMapping("/{subDirectory}/{object}")
     public void getObjectWithSubDirectory(@PathVariable("subDirectory") String subDirectory,
@@ -89,7 +90,6 @@ public class UploadResource {
                                           HttpServletResponse response)
             throws IOException, MinioException {
         InputStream inputStream = minioService.get((Paths.get(subDirectory +"/" + object)));
-        ;
         InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
 
         // SET THE CONTENT TYPE AND ATTACHMENT HEADER.
