@@ -1,5 +1,6 @@
 # minio-storage
-This is a Java application for minio storage.
+There're millionth way to do minio-storage.
+This was a gold.
 
 # Run in Postman
 
