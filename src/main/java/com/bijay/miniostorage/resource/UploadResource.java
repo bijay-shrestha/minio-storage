@@ -53,8 +53,24 @@ public class UploadResource {
     }
 
     @PostMapping
-    public void addAttachement(@RequestParam("file") MultipartFile file) {
+    public void addAttachment(@RequestParam("file") MultipartFile file) {
         Path path = Paths.get(Objects.requireNonNull(file.getOriginalFilename()));
+        log.info("The designated path is :: {}", path);
+        try {
+            minioService.upload(path, file.getInputStream(), file.getContentType());
+        } catch (MinioException e) {
+            throw new IllegalStateException("The file cannot be upload on the internal storage." +
+                    " Please retry later", e);
+        } catch (IOException e) {
+            throw new IllegalStateException("The file cannot be read", e);
+        }
+    }
+
+    @PostMapping("/sub-dir/{subDirectory}")
+    public void addAttachmentIntoSubDirectory
+            (@PathVariable("subDirectory") String subDirectory,
+             @RequestParam("file") MultipartFile file) {
+        Path path = Paths.get(subDirectory + "/" + file.getOriginalFilename());
         log.info("The designated path is :: {}", path);
         try {
             minioService.upload(path, file.getInputStream(), file.getContentType());
