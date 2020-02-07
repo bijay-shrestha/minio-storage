@@ -1,6 +1,6 @@
 # minio-storage
 There're millionth way to do minio-storage.
-This was a gold.
+This one was with less bulls#its.
 
 # Run in Postman
 
